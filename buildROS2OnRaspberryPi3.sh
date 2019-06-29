@@ -12,17 +12,17 @@
 # Script broken into pieces so one can adapt and debug.
 # Change each of the section flags to either "yes" or "no".
 DoIncreaseSwapSpace="no"    # MANUAL STEP
-DoSetKeys="yes"             # Fetch ROS2 repository keys (only needs to happen once)
-DoSetLocale="yes"           # Set locale environment (only needs to happen once)
-DoFetchBuildTools="yes"     # Fetch all tools needed for building ROS2
+DoSetKeys="no"             # Fetch ROS2 repository keys (only needs to happen once)
+DoSetLocale="no"           # Set locale environment (only needs to happen once)
+DoFetchBuildTools="no"     # Fetch all tools needed for building ROS2
 DoFetchNewCMake="no"        # Fetch newer version of CMake (can fix some build errors)
-DoFetchROS2Sources="yes"    # Fetch the ROS2 sources from Github
+DoFetchROS2Sources="no"    # Fetch the ROS2 sources from Github
 DoCleanFetchROS2Sources="no" # if set to 'yes', delete existing and fetch new, clean source tree
 DoFetchROS2Dependencies="yes"   # Run rosdep to fetch and build dependencies
-DoBuild="yes"               # Build ROS2
-DoCreateTARFiles="yes"      # Create a TAR file of the installed ROS2
+DoBuild="no"               # Build ROS2
+DoCreateTARFiles="no"      # Create a TAR file of the installed ROS2
 
-ROS2_DISTRO=crystal
+ROS2_DISTRO=dashing
 
 # The state of tools that seem to work
 # uname -a
@@ -75,6 +75,9 @@ if [[ "$DoFetchBuildTools" == "yes" ]] ; then
       cmake \
       git \
       python3-colcon-common-extensions \
+      python3-lark-parser
+      python3-lxml
+      python3-numpy
       python3-pip \
       python3-rosdep \
       python3-vcstool \
@@ -138,7 +141,8 @@ if [[ "$DoFetchROS2Sources" == "yes" ]] ; then
         echo "===    Clean fetch of ROS2 Sources"
         rm -rf src
         rm -f ros2.repos
-        wget https://raw.githubusercontent.com/ros2/ros2/${ROS_RELEASE}/ros2.repos
+#        wget https://raw.githubusercontent.com/ros2/ros2/${ROS_RELEASE}/ros2.repos
+        wget https://raw.githubusercontent.com/ros2/ros2/release-latest/ros2.repos
         mkdir src
         vcs import src < ros2.repos
     else
@@ -159,7 +163,7 @@ if [[ "$DoFetchROS2Dependencies" == "yes" ]] ; then
         sudo rosdep init
     fi
     rosdep update
-    rosdep install --from-paths src --ignore-src --rosdistro $ROS2_DISTRO -y --skip-keys "console_bridge fastcdr fastrtps libopensplice67 rti-connext-dds-5.3.1 urdfdom_headers"
+    rosdep install --from-paths src --ignore-src --rosdistro $ROS2_DISTRO -y --skip-keys "console_bridge fastcdr fastrtps libopensplice67 libopensplice69 rti-connext-dds-5.3.1 urdfdom_headers python3-lark-parser"
 else
     echo "=== Not fetching ROS2 dependencies"
 fi
